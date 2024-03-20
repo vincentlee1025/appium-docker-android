@@ -1,5 +1,5 @@
-FROM ubuntu:focal-20240123
-
+FROM --platform=linux/amd64 ubuntu:focal-20240123
+USER root
 ENV DEBIAN_FRONTEND=noninteractive
 
 #==================
@@ -44,8 +44,27 @@ RUN apt-get -qqy update && \
     unzip \
     wget \
     xvfb \
-    zip \
-  && rm -rf /var/lib/apt/lists/*
+    zip &&\
+    sudo apt-get -y install python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+
+#==========================
+# Install Python dependency
+#==========================
+RUN sudo pip3 install --upgrade setuptools && \
+    sudo pip3 install Appium-Python-Client==2.9.0 \
+    selenium \
+    lxml \
+    wheel \
+    PyYAML \
+    numpy \
+    Matplotlib \
+    opencv-python \
+    scikit-image netifaces \
+    apscheduler \
+    requests \
+    paramiko
 
 #===============
 # Set JAVA_HOME
@@ -113,6 +132,7 @@ ENV APPIUM_VERSION=2.5.0
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash && \
     apt-get -qqy install nodejs && \
     npm install -g appium@${APPIUM_VERSION} && \
+    sudo npm install -g appium-doctor && \
     exit 0 && \
     npm cache clean && \
     apt-get remove --purge -y npm && \
